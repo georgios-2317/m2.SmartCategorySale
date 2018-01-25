@@ -41,20 +41,22 @@ class ProductListObserver implements ObserverInterface
 		$select = $collection->getSelect();
 		$connection = $select->getConnection();	
 		
-		$select	
-			->joinLeft(
-				['sale_index' => $collection->getTable('faonni_catalog_product_index_sale')],
-				join(
-					' AND ',
-					[
-						'e.entity_id = sale_index.entity_id',
-						'price_index.website_id = sale_index.website_id'
-					]
-				),				
-				[]
-			)
-			->where('(smart_category.rule_id IS NOT NULL AND sale_flag.entity_id IS NOT NULL) OR smart_category.rule_id IS NULL');		
-			
+	    	if ($collection->hasFlag('smart_category')) {
+			$select	
+				->joinLeft(
+					['sale_index' => $collection->getTable('faonni_catalog_product_index_sale')],
+					join(
+						' AND ',
+						[
+							'e.entity_id = sale_index.entity_id',
+							'price_index.website_id = sale_index.website_id'
+						]
+					),				
+					[]
+				)
+				->where('(smart_category.rule_id IS NOT NULL AND sale_flag.entity_id IS NOT NULL) OR smart_category.rule_id IS NULL');		
+			$collection->setFlag('smart_category', true);
+		}
         return $this;
     }
 }  
